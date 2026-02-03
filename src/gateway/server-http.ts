@@ -34,6 +34,7 @@ import {
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
+import { createVoiceWebhookHandler, type VoiceWebhookHandler } from "./voice-webhook.js";
 
 type SubsystemLogger = ReturnType<typeof createSubsystemLogger>;
 
@@ -218,6 +219,8 @@ export function createGatewayHttpServer(opts: {
   handlePluginRequest?: HooksRequestHandler;
   resolvedAuth: import("./auth.js").ResolvedGatewayAuth;
   tlsOptions?: TlsOptions;
+  /** Voice webhook handler (stub for voice terminal input) */
+  handleVoiceWebhook?: VoiceWebhookHandler;
 }): HttpServer {
   const {
     canvasHost,
@@ -230,6 +233,7 @@ export function createGatewayHttpServer(opts: {
     handleHooksRequest,
     handlePluginRequest,
     resolvedAuth,
+    handleVoiceWebhook,
   } = opts;
   const httpServer: HttpServer = opts.tlsOptions
     ? createHttpsServer(opts.tlsOptions, (req, res) => {
@@ -249,6 +253,10 @@ export function createGatewayHttpServer(opts: {
       const configSnapshot = loadConfig();
       const trustedProxies = configSnapshot.gateway?.trustedProxies ?? [];
       if (await handleHooksRequest(req, res)) {
+        return;
+      }
+      // Voice webhook: terminal endpoint for voice input (stub)
+      if (handleVoiceWebhook && (await handleVoiceWebhook(req, res))) {
         return;
       }
       if (
