@@ -252,6 +252,9 @@ export async function runAgentTurnWithFallback(params: {
             provider === params.followupRun.run.provider
               ? params.followupRun.run.authProfileId
               : undefined;
+          const isVoiceTerminal =
+            params.sessionCtx.Provider?.trim().toLowerCase() === "voice-terminal" ||
+            params.sessionCtx.Surface?.trim().toLowerCase() === "voice-terminal";
           return runEmbeddedPiAgent({
             sessionId: params.followupRun.run.sessionId,
             sessionKey: params.sessionKey,
@@ -306,6 +309,7 @@ export async function runAgentTurnWithFallback(params: {
             timeoutMs: params.followupRun.run.timeoutMs,
             runId,
             images: params.opts?.images,
+            disableTools: isVoiceTerminal,
             abortSignal: params.opts?.abortSignal,
             blockReplyBreak: params.resolvedBlockStreamingBreak,
             blockReplyChunking: params.blockReplyChunking,

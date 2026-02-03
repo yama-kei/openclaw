@@ -107,8 +107,8 @@ export async function createGatewayRuntimeState(params: {
     log: params.logPlugins,
   });
 
-  // Voice webhook handler (stub for voice terminal input)
-  const handleVoiceWebhook = createVoiceWebhookHandler();
+  // Voice webhook handler for voice terminal input (STT + agent dispatch)
+  const handleVoiceWebhook = createVoiceWebhookHandler({ cfg: params.cfg });
 
   const bindHosts = await resolveGatewayListenHosts(params.bindHost);
   const httpServers: HttpServer[] = [];
