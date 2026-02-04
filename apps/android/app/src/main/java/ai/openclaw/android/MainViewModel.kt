@@ -63,6 +63,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
   val chatPendingToolCalls = runtime.chatPendingToolCalls
   val chatSessions = runtime.chatSessions
   val pendingRunCount: StateFlow<Int> = runtime.pendingRunCount
+  val connectedEndpoint = runtime.connectedEndpointFlow
 
   fun setForeground(value: Boolean) {
     runtime.setForeground(value)
@@ -170,5 +171,17 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
   fun sendChat(message: String, thinking: String, attachments: List<OutgoingAttachment>) {
     runtime.sendChat(message = message, thinking = thinking, attachments = attachments)
+  }
+
+  fun resolveVoiceTerminalTarget(): NodeRuntime.VoiceTerminalTarget? {
+    return runtime.resolveVoiceTerminalTarget()
+  }
+
+  fun resolveVoiceTerminalSessionId(): String {
+    return runtime.resolveVoiceTerminalSessionId()
+  }
+
+  fun saveGatewayTlsFingerprint(stableId: String, fingerprint: String) {
+    runtime.saveGatewayTlsFingerprint(stableId, fingerprint)
   }
 }

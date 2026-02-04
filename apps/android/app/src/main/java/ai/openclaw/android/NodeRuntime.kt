@@ -150,6 +150,8 @@ class NodeRuntime(context: Context) {
   private var operatorStatusText: String = "Offline"
   private var nodeStatusText: String = "Offline"
   private var connectedEndpoint: GatewayEndpoint? = null
+  private val _connectedEndpoint = MutableStateFlow<GatewayEndpoint?>(null)
+  val connectedEndpointFlow: StateFlow<GatewayEndpoint?> = _connectedEndpoint.asStateFlow()
 
   private val operatorSession =
     GatewaySession(
@@ -559,6 +561,7 @@ class NodeRuntime(context: Context) {
 
   fun connect(endpoint: GatewayEndpoint) {
     connectedEndpoint = endpoint
+    _connectedEndpoint.value = endpoint
     operatorStatusText = "Connecting…"
     nodeStatusText = "Connecting…"
     updateStatus()
@@ -609,8 +612,28 @@ class NodeRuntime(context: Context) {
 
   fun disconnect() {
     connectedEndpoint = null
+    _connectedEndpoint.value = null
     operatorSession.disconnect()
     nodeSession.disconnect()
+  }
+
+  data class VoiceTerminalTarget(
+    val endpoint: GatewayEndpoint,
+    val tlsParams: GatewayTlsParams?,
+  )
+
+  fun resolveVoiceTerminalTarget(): VoiceTerminalTarget? {
+    val endpoint = connectedEndpoint ?: return null
+    val tls = resolveTlsParams(endpoint)
+    return VoiceTerminalTarget(endpoint, tls)
+  }
+
+  fun resolveVoiceTerminalSessionId(): String {
+    return prefs.loadOrCreateVoiceTerminalSessionId()
+  }
+
+  fun saveGatewayTlsFingerprint(stableId: String, fingerprint: String) {
+    prefs.saveGatewayTlsFingerprint(stableId, fingerprint)
   }
 
   private fun resolveTlsParams(endpoint: GatewayEndpoint): GatewayTlsParams? {

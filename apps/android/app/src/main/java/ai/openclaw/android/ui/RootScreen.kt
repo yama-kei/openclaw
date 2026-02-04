@@ -44,6 +44,7 @@ import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FiberManualRecord
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Refresh
@@ -225,6 +226,11 @@ fun RootScreen(viewModel: MainViewModel) {
         icon = { Icon(Icons.Default.ChatBubble, contentDescription = "Chat") },
       )
 
+      OverlayIconButton(
+        onClick = { sheet = Sheet.VoiceTerminal },
+        icon = { Icon(Icons.Default.Mic, contentDescription = "Voice Terminal") },
+      )
+
       // Talk mode gets a dedicated side bubble instead of burying it in settings.
       val baseOverlay = overlayContainerColor()
       val talkContainer =
@@ -283,6 +289,7 @@ fun RootScreen(viewModel: MainViewModel) {
     ) {
       when (currentSheet) {
         Sheet.Chat -> ChatSheet(viewModel = viewModel)
+        Sheet.VoiceTerminal -> VoiceTerminalSheet(viewModel = viewModel)
         Sheet.Settings -> SettingsSheet(viewModel = viewModel)
       }
     }
@@ -291,6 +298,7 @@ fun RootScreen(viewModel: MainViewModel) {
 
 private enum class Sheet {
   Chat,
+  VoiceTerminal,
   Settings,
 }
 

@@ -20,6 +20,7 @@ class SecurePrefs(context: Context) {
     val defaultWakeWords: List<String> = listOf("openclaw", "claude")
     private const val displayNameKey = "node.displayName"
     private const val voiceWakeModeKey = "voiceWake.mode"
+    private const val voiceTerminalSessionKey = "voiceTerminal.sessionId"
   }
 
   private val appContext = context.applicationContext
@@ -178,6 +179,15 @@ class SecurePrefs(context: Context) {
   fun saveGatewayTlsFingerprint(stableId: String, fingerprint: String) {
     val key = "gateway.tls.$stableId"
     prefs.edit { putString(key, fingerprint.trim()) }
+  }
+
+  fun loadOrCreateVoiceTerminalSessionId(): String {
+    val key = "$voiceTerminalSessionKey.${_instanceId.value}"
+    val existing = prefs.getString(key, null)?.trim()
+    if (!existing.isNullOrBlank()) return existing
+    val fresh = UUID.randomUUID().toString()
+    prefs.edit { putString(key, fresh) }
+    return fresh
   }
 
   fun getString(key: String): String? {
